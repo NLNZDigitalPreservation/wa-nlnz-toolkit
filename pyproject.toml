@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wa_nlnz"
+version = "0.1.0"
+description = "Web archive analysis tools for National Library New Zealand"
+authors = [
+  { name="Yizhe", email="yizhe.git@gmail.com" }
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/NLNZDigitalPreservation/wa_nlnz"
