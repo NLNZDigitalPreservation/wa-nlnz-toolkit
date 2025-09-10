@@ -13,6 +13,11 @@ This toolkit provides utilities for querying and extracting data from the Nation
 ## 🚀 Installation
 
 ```bash
+# Install dev mode with extras
+pip install -e .[dev]
+```
+
+```bash
 pip install -i https://test.pypi.org/simple/ wa-nlnz-toolkit
 ```
 
