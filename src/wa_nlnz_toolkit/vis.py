@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from wordcloud import WordCloud
 
 
 def plot_monthly_captures(df_records: pd.DataFrame):
@@ -34,4 +35,19 @@ def plot_monthly_captures(df_records: pd.DataFrame):
     ax.set_ylabel("Count")
     plt.tight_layout()
     plt.show()
-    
+
+
+def create_world_cloud(list_sentences: list, output_filename: str):
+    # Combine all sentences into one text
+    text = " ".join(list_sentences)
+
+    # Generate word cloud
+    wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
+
+    # Plot and save
+    plt.figure(figsize=(10, 5))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis("off")
+    plt.tight_layout()
+    plt.savefig(output_filename)
+    # plt.close()

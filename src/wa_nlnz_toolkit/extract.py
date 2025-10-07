@@ -2,6 +2,8 @@ import boto3
 from botocore import UNSIGNED
 from warcio.archiveiterator import ArchiveIterator
 from urllib.parse import urlparse
+from bs4 import BeautifulSoup
+
 
 
 def extract_payload(path: str, offset: int) -> bytes | None:
@@ -46,3 +48,17 @@ def extract_payload(path: str, offset: int) -> bytes | None:
             stream.close()
 
     return None
+
+
+def extract_content_html(html_payload):
+    # Parse HTML
+    soup = BeautifulSoup(html_payload, "html.parser")
+
+    # Get all <p> elements as separate paragraphs
+    paragraphs = [p.get_text(" ", strip=True) for p in soup.find_all("p")]
+
+    list_para = []
+    for para in paragraphs:
+        list_para.append(para)
+
+    return list_para

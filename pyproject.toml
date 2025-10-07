@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=77.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "wa_nlnz_toolkit"
-version = "0.1.3"
+version = "0.2.0"
 description = "Web archive analysis toolkit for National Library New Zealand"
 authors = [
   { name="Yizhe", email="yizhe.git@gmail.com" }
@@ -30,3 +30,6 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/NLNZDigitalPreservation/wa-nlnz-toolkit"
+
+[tool.setuptools]
+license-files = []

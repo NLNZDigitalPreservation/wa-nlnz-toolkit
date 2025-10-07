@@ -1,31 +1,35 @@
-import asyncio
-from playwright.async_api import async_playwright
+import time
 import validators
+import chromedriver_autoinstaller
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 
-async def take_screenshot_async(website_url: str):
-    if not validators.url(website_url):
-        print(f"Invalid URL: {website_url}. Aborting...")
-        return
+def screenshot_webpage(url, output_path="/content/screenshot.png", delay=2):
+    """
+    Takes a screenshot of the given webpage and saves it to output_path.
 
-    async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch(headless=True)
-        page = await browser.new_page(ignore_https_errors=True, viewport={"width": 1920, "height": 4000})
-        try:
-            await page.goto(website_url)
+    Parameters:
+        url (str): The webpage URL.
+        output_path (str): File path to save the screenshot.
+        delay (int): Seconds to wait for page loading before capturing.
+    """
+    # Automatically install the matching ChromeDriver version
+    chromedriver_path = chromedriver_autoinstaller.install()
 
-            # await page.evaluate("""() => {
-            #     window.scrollBy(0, document.body.scrollHeight);
-            # }""")
-            # await page.wait_for_timeout(2000)  # wait for lazy-loaded content
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--window-size=1920,4000")
 
-        except Exception as e:
-            print(f"Failed to load URL: {website_url}. Error: {e}")
-        else:
-            screenshot_filename = f"{website_url.replace('https://', '').replace('/', '_')}.png"
-            await page.screenshot(path=screenshot_filename, full_page=True)
-            print(f"Screenshot saved as {screenshot_filename}")
-        await browser.close()
+    service = Service(chromedriver_path)
+    driver = webdriver.Chrome(service=service, options=chrome_options)
 
-
-# TEST - Run the async function in Jupyter
-# await take_screenshot_async("https://ndhadeliver.natlib.govt.nz/webarchive/20250401004141/https://covid19.govt.nz/")
+    try:
+        driver.get(url)
+        time.sleep(delay)  # wait for page to load
+        driver.save_screenshot(output_path)
+        print(f"✅ Screenshot saved to: {output_path}")
+    finally:
+        driver.quit()
