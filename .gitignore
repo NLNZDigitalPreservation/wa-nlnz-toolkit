@@ -3,3 +3,4 @@ lib
 .pytest_cache
 *.egg-info
 __pycache__
+.venv
