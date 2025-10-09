@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "wa_nlnz_toolkit"
-version = "0.2.0"
+version = "0.2.1"
 description = "Web archive analysis toolkit for National Library New Zealand"
 authors = [
   { name="Yizhe", email="yizhe.git@gmail.com" }

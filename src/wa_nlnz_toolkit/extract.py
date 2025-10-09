@@ -50,15 +50,76 @@ def extract_payload(path: str, offset: int) -> bytes | None:
     return None
 
 
+# def extract_content_html(html_payload):
+#     # Parse HTML
+#     soup = BeautifulSoup(html_payload, "html.parser")
+
+#     # Get all <p> elements as separate paragraphs
+#     paragraphs = [p.get_text(" ", strip=True) for p in soup.find_all("p")]
+
+#     list_para = []
+#     for para in paragraphs:
+#         list_para.append(para)
+
+#     return list_para
+
+# def extract_content_html(html_payload):
+#     # Parse HTML
+#     soup = BeautifulSoup(html_payload, "html.parser")
+
+#     # Focus on the main content section
+#     main_section = soup.find(id="main-container")
+#     if not main_section:
+#         main_section = soup
+
+#     # Remove header sections inside main (if any)
+#     for header in main_section.find_all(class_="header"):
+#         header.decompose()
+
+#     # Extract text from <p> and <li> elements
+#     elements = main_section.find_all(["p", "li"])
+#     content_list = [el.get_text(" ", strip=True) for el in elements if el.get_text(strip=True)]
+
+#     return content_list
+
+
 def extract_content_html(html_payload):
     # Parse HTML
     soup = BeautifulSoup(html_payload, "html.parser")
 
-    # Get all <p> elements as separate paragraphs
-    paragraphs = [p.get_text(" ", strip=True) for p in soup.find_all("p")]
+    # Focus on the main content section
+    main_section = soup.find("main")
+    if not main_section:
+        main_section = soup.find("main-container")
+        if not main_section:
+            main_section = soup
 
-    list_para = []
-    for para in paragraphs:
-        list_para.append(para)
+    # Remove header sections if any
+    # for header in main_section.find_all(class_="header"):
+    #     header.decompose()
 
-    return list_para
+    # Find all <section> elements within main
+    sections = main_section.find_all("section", recursive=True)
+    content_list = []
+
+    # If there are no explicit <section>s, just treat main as one section
+    if not sections:
+        sections = [main_section]
+
+    # Extract text section by section
+    for i, section in enumerate(sections):
+        section_paragraphs = []
+
+        # Extract <p> and <li> text
+        for el in section.find_all(["p", "li"]):
+            text = el.get_text(" ", strip=True)
+            if text:
+                section_paragraphs.append(text)
+
+        if section_paragraphs:
+            # Optionally, add a section header or separator
+            if i > 0:
+                content_list.append("--- Section Separator ---")
+            content_list.extend(section_paragraphs)
+
+    return content_list

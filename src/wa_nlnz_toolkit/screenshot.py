@@ -23,6 +23,11 @@ def screenshot_webpage(url, output_path="/content/screenshot.png", delay=2):
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--window-size=1920,4000")
 
+    # ✅ Add custom User-Agent here
+    chrome_options.add_argument(
+        "--user-agent=NLNZWebArchiveAccessBot/1.0 (wa-nlnz-toolkit)"
+    )
+
     service = Service(chromedriver_path)
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
