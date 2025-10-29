@@ -21,15 +21,25 @@ pip install -e .[dev]
 pip install -i https://test.pypi.org/simple/ wa-nlnz-toolkit
 ```
 
-## 📦 Usage
+## 📦 Jupyter Notebooks
 
-### CLI
+The Jupyter notebooks for iPRES-2025 workshop can be found in ``notebook/iPRES2025` folder. To run the Jupyter notebooks on Google Colab, simply follow the following two steps,
 
-TBD
+1. Get the GitHub URL of the notebook (the raw .ipynb file).
 
-### Python
+```
+Example: https://github.com/NLNZDigitalPreservation/wa-nlnz-toolkit/blob/main/notebook/iPRES2025/exp-01_WebArchive_Access_Fundamentals.ipynb
+```
 
-TBD
+2. Modify the URL for Colab - Replace github.com with colab.research.google.com/github
+
+```
+Example:
+
+GitHub URL:https://github.com/NLNZDigitalPreservation/wa-nlnz-toolkit/blob/main/notebook/iPRES2025/exp-01_WebArchive_Access_Fundamentals.ipynb
+
+Colab URL: https://colab.research.google.com/github/NLNZDigitalPreservation/wa-nlnz-toolkit/blob/main/notebook/iPRES2025/exp-01_WebArchive_Access_Fundamentals.ipynb
+```
 
 ## 📁 Data Sources
 
