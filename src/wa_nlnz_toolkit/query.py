@@ -6,9 +6,18 @@ import pandas as pd
 
 # NLNZ selective web archive
 MEMENTO_URL = "https://ndhadeliver.natlib.govt.nz/webarchive"
-CDX_API_URL = f"{MEMENTO_URL}/cdx"
+#CDX_API_URL = f"{MEMENTO_URL}/cdx"
 
 header = {"User-Agent": "NLNZWebArchiveAccessBot/1.0 (wa-nlnz-toolkit)"}
+
+
+def set_memento_url(url: str):
+    global MEMENTO_URL
+    MEMENTO_URL = url
+
+
+def get_cdx_api_url():
+    return f"{MEMENTO_URL}/cdx"
 
 
 def query_cdx_index(url: str, timeout: int = 60, **params) -> requests.Response:
@@ -31,7 +40,7 @@ def query_cdx_index(url: str, timeout: int = 60, **params) -> requests.Response:
     """
     query_params = {"url": url, "output": "json", **params}
 
-    response = requests.get(CDX_API_URL, params=query_params, timeout=timeout, headers=header)
+    response = requests.get(get_cdx_api_url(), params=query_params, timeout=timeout, headers=header)
     response.raise_for_status()
 
     records = [json.loads(line) for line in response.text.strip().splitlines()]
@@ -140,6 +149,7 @@ def get_timemap(url: str, format: str="json"):
     """
     query_url = MEMENTO_URL + "/" + f"timemap/{format}/{url}"
     print(query_url)
+    # query_url = "https://nettarkivet.nb.no/search/timemap/json/http://www.met.no"
 
     response = requests.get(query_url, allow_redirects=True, headers=header, verify=False)
     response.raise_for_status()
@@ -156,13 +166,14 @@ def get_timemap(url: str, format: str="json"):
     df_records.sort_index(inplace=True)
 
     # Replace the URL format
-    df_records["access_url"] = df_records["load_url"].str.replace(
-        r"https://wlgprdowapp01\.natlib\.govt\.nz/nlnzwebarchive_PROD/ap/(\d+)id_/((https?://.+))",
-        r"https://ndhadeliver.natlib.govt.nz/webarchive/\1/\2",
-        regex=True,
-    )
+    if "load_url" in df_records.columns:
+        df_records["access_url"] = df_records["load_url"].str.replace(
+            r"https://wlgprdowapp01\.natlib\.govt\.nz/nlnzwebarchive_PROD/ap/(\d+)id_/((https?://.+))",
+            r"https://ndhadeliver.natlib.govt.nz/webarchive/\1/\2",
+            regex=True,
+        )
     # remove "load_url" column
-    df_records.drop("load_url", axis=1, inplace=True)
+        df_records.drop("load_url", axis=1, inplace=True)
 
 
     return df_records
