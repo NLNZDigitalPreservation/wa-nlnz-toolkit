@@ -3,12 +3,16 @@ import json
 import datetime
 import pandas as pd
 
+from wa_nlnz_toolkit._config import (
+    header,
+    INTERNAL_URL_PATTERN,
+    EXTERNAL_URL_REPLACEMENT,
+)
+
 
 # NLNZ selective web archive
 MEMENTO_URL = "https://ndhadeliver.natlib.govt.nz/webarchive"
-#CDX_API_URL = f"{MEMENTO_URL}/cdx"
-
-header = {"User-Agent": "NLNZWebArchiveAccessBot/1.0 (wa-nlnz-toolkit)"}
+# CDX_API_URL = f"{MEMENTO_URL}/cdx"
 
 
 def set_memento_url(url: str):
@@ -40,7 +44,13 @@ def query_cdx_index(url: str, timeout: int = 60, **params) -> requests.Response:
     """
     query_params = {"url": url, "output": "json", **params}
 
-    response = requests.get(get_cdx_api_url(), params=query_params, timeout=timeout, headers=header)
+    response = requests.get(
+        get_cdx_api_url(),
+        params=query_params,
+        timeout=timeout,
+        headers=header,
+        verify=False,
+    )
     response.raise_for_status()
 
     records = [json.loads(line) for line in response.text.strip().splitlines()]
@@ -52,8 +62,8 @@ def query_cdx_index(url: str, timeout: int = 60, **params) -> requests.Response:
 
     # Replace the URL format
     df_records["access_url"] = df_records["load_url"].str.replace(
-        r"https://wlgprdowapp01\.natlib\.govt\.nz/nlnzwebarchive_PROD/ap/(\d+)id_/((https?://.+))",
-        r"https://ndhadeliver.natlib.govt.nz/webarchive/\1/\2",
+        INTERNAL_URL_PATTERN,
+        EXTERNAL_URL_REPLACEMENT,
         regex=True,
     )
     # remove "load_url" column
@@ -86,7 +96,7 @@ def query_memento(
 
     if dt != None:
         header["Accept-Datetime"] = dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
-    
+
     response = requests.get(
         query_url, headers=header, allow_redirects=allow_redirects, verify=False
     )
@@ -118,7 +128,7 @@ def get_memento_urls(url: str, dt: datetime.datetime = None):
         requests.HTTPError: If the request fails due to an HTTP error.
     """
     response = query_memento(url, dt)
-    
+
     dict_urls = {}
     for key in response.links.keys():
         dict_urls[key] = response.links[key]["url"]
@@ -126,7 +136,7 @@ def get_memento_urls(url: str, dt: datetime.datetime = None):
     return dict_urls
 
 
-def get_timemap(url: str, format: str="json"):
+def get_timemap(url: str, format: str = "json"):
     """
     Retrieve the timemap of a given URL from the National Library of New Zealand's Web Archive.
 
@@ -151,7 +161,9 @@ def get_timemap(url: str, format: str="json"):
     print(query_url)
     # query_url = "https://nettarkivet.nb.no/search/timemap/json/http://www.met.no"
 
-    response = requests.get(query_url, allow_redirects=True, headers=header, verify=False)
+    response = requests.get(
+        query_url, allow_redirects=True, headers=header, verify=False
+    )
     response.raise_for_status()
 
     if response.headers["content-type"] == "text/x-ndjson":
@@ -168,12 +180,11 @@ def get_timemap(url: str, format: str="json"):
     # Replace the URL format
     if "load_url" in df_records.columns:
         df_records["access_url"] = df_records["load_url"].str.replace(
-            r"https://wlgprdowapp01\.natlib\.govt\.nz/nlnzwebarchive_PROD/ap/(\d+)id_/((https?://.+))",
-            r"https://ndhadeliver.natlib.govt.nz/webarchive/\1/\2",
+            INTERNAL_URL_PATTERN,
+            EXTERNAL_URL_REPLACEMENT,
             regex=True,
         )
-    # remove "load_url" column
+        # remove "load_url" column
         df_records.drop("load_url", axis=1, inplace=True)
-
 
     return df_records

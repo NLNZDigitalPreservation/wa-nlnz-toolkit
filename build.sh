@@ -1,6 +1,9 @@
-# build python package
-python -m build
+# clean previous builds
+rm -rf dist/
 
-# upload the package to testpypi
-twine upload --repository testpypi dist/*
+# build wheel only (no source distribution)
+python -m build --wheel
+
+# upload only the wheel to testpypi
+twine upload --repository testpypi dist/*.whl
 
