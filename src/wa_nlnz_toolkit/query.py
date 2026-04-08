@@ -60,14 +60,16 @@ def query_cdx_index(url: str, timeout: int = 60, **params) -> requests.Response:
     # sort by index
     df_records.sort_index(inplace=True)
 
-    # Replace the URL format
-    df_records["access_url"] = df_records["load_url"].str.replace(
-        INTERNAL_URL_PATTERN,
-        EXTERNAL_URL_REPLACEMENT,
-        regex=True,
-    )
-    # remove "load_url" column
-    df_records.drop("load_url", axis=1, inplace=True)
+    
+    if "load_url" in df_records.columns:
+        # Replace the URL format
+        df_records["access_url"] = df_records["load_url"].str.replace(
+            INTERNAL_URL_PATTERN,
+            EXTERNAL_URL_REPLACEMENT,
+            regex=True,
+        )
+        # remove "load_url" column
+        df_records.drop("load_url", axis=1, inplace=True)
 
     return df_records
 
