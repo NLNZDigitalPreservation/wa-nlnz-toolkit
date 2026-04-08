@@ -8,3 +8,5 @@ scratch
 worldcloud
 .DS_Store
 chroma_db
+*.warc.gz
+*.cdx

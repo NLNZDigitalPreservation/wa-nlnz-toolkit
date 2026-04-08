@@ -18,7 +18,7 @@ pip install -e .[dev]
 ```
 
 ```bash
-pip install -i https://test.pypi.org/simple/ wa-nlnz-toolkit
+pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ wa-nlnz-toolkit==0.3.3
 ```
 
 ## 📦 Jupyter Notebooks
