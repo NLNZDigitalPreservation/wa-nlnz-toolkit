@@ -9,6 +9,7 @@ from .query import (
 from .vis import plot_monthly_captures, create_world_cloud
 from .screenshot import screenshot_webpage
 from .aws import list_s3_files, download_s3_file, load_cdx_file_from_s3
+from ._future_comparison_view import build_content_comparison_html
 
 from importlib.metadata import (
     PackageNotFoundError as _PackageNotFoundError,
@@ -39,4 +40,5 @@ __all__ = [
     "list_s3_files",
     "download_s3_file",
     "load_cdx_file_from_s3",
+    "build_content_comparison_html",
 ]

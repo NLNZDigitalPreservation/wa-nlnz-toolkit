@@ -5,7 +5,6 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
 
-
 def extract_payload(path: str, offset: int) -> bytes | None:
     """
     Extracts the payload from a WARC (Web ARChive) file starting at a given byte offset.
@@ -48,7 +47,7 @@ def extract_payload(path: str, offset: int) -> bytes | None:
             stream.close()
 
     return None
-    
+
 
 def extract_content_html(html_payload):
     # Parse HTML
