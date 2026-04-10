@@ -18,10 +18,15 @@ MEMENTO_URL = "https://ndhadeliver.natlib.govt.nz/webarchive"
 def set_memento_url(url: str):
     global MEMENTO_URL
     MEMENTO_URL = url
+    set_cdx_api_url(f"{MEMENTO_URL}/cdx")
 
 
 def get_cdx_api_url():
-    return f"{MEMENTO_URL}/cdx"
+    return CDX_API_URL
+
+def set_cdx_api_url(url: str):
+    global CDX_API_URL
+    CDX_API_URL = url
 
 
 def query_cdx_index(url: str, timeout: int = 60, **params) -> requests.Response:
@@ -53,8 +58,16 @@ def query_cdx_index(url: str, timeout: int = 60, **params) -> requests.Response:
     )
     response.raise_for_status()
 
-    records = [json.loads(line) for line in response.text.strip().splitlines()]
-    df_records = pd.DataFrame(records)
+    # Handle responses from Internet Archive differently
+    if get_cdx_api_url().startswith("https://web.archive.org/cdx"):
+        data = json.loads(response.text)
+        headers = data[0]
+        rows = data[1:]
+        df_records = pd.DataFrame(rows, columns=headers)
+    else:
+        records = [json.loads(line) for line in response.text.strip().splitlines()]
+        df_records = pd.DataFrame(records)
+
     df_records["timestamp"] = pd.to_datetime(df_records["timestamp"])
     df_records.set_index("timestamp", inplace=True)
     # sort by index
@@ -161,7 +174,6 @@ def get_timemap(url: str, format: str = "json"):
     """
     query_url = MEMENTO_URL + "/" + f"timemap/{format}/{url}"
     print(query_url)
-    # query_url = "https://nettarkivet.nb.no/search/timemap/json/http://www.met.no"
 
     response = requests.get(
         query_url, allow_redirects=True, headers=header, verify=False
@@ -170,10 +182,16 @@ def get_timemap(url: str, format: str = "json"):
 
     if response.headers["content-type"] == "text/x-ndjson":
         data = [json.loads(line) for line in response.text.splitlines()]
+        df_records = pd.DataFrame(data)
+    elif response.headers["content-type"] == "application/json":
+        data = json.loads(response.text)
+        headers = data[0]
+        rows = data[1:]
+        df_records = pd.DataFrame(rows, columns=headers)
     else:
         data = response.text
+        df_records = pd.DataFrame(data)
 
-    df_records = pd.DataFrame(data)
     df_records["timestamp"] = pd.to_datetime(df_records["timestamp"])
     df_records.set_index("timestamp", inplace=True)
     # sort by index

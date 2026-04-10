@@ -5,6 +5,7 @@ from .query import (
     get_memento_urls,
     get_timemap,
     set_memento_url,
+    set_cdx_api_url,
 )
 from .vis import plot_monthly_captures, create_world_cloud
 from .screenshot import screenshot_webpage
