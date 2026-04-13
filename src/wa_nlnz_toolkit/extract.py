@@ -50,6 +50,27 @@ def extract_payload(path: str, offset: int) -> bytes | None:
 
 
 def extract_content_html(html_payload):
+    """
+    Extract text content from an HTML payload by parsing its main content elements.
+
+    The function looks for a ``<main>`` element first, then falls back to a
+    ``<main-container>`` element, and finally to the entire parsed document if
+    neither is present. It extracts text from ``<p>`` and ``<li>`` elements
+    within each ``<section>`` and returns the collected text as a list of
+    strings. When multiple sections contain text, a section separator string is
+    inserted between them.
+
+    Parameters
+    ----------
+    html_payload : str or bytes
+        The raw HTML content to parse and extract text from.
+
+    Returns
+    -------
+    list[str]
+        A list of extracted text strings from the HTML content, with section
+        separators included when multiple populated sections are found.
+    """
     # Parse HTML
     soup = BeautifulSoup(html_payload, "html.parser")
 

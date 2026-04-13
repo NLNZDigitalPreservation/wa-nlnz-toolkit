@@ -38,6 +38,7 @@ def screenshot_webpage(url, output_path="/content/screenshot.png", delay=2):
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--window-size=1920,4000")
+    chrome_options.add_argument("--ignore-certificate-errors")
 
     # ✅ Add custom User-Agent here
     chrome_options.add_argument(f"--user-agent={header['User-Agent']}")
