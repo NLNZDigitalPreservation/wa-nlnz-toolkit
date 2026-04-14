@@ -1,5 +1,7 @@
+build
 dist
 lib
+.vscode
 .pytest_cache
 *.egg-info
 __pycache__
