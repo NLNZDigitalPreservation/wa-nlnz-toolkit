@@ -1,0 +1,71 @@
+name: Build and Publish to TestPyPI
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "src/wa_nlnz_toolkit/**"
+
+jobs:
+    build-and-publish:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+
+            - name: Install build tools
+              run: pip install build wheel twine
+
+            - name: Bump patch version in pyproject.toml
+              id: bump_version
+              run: |
+                  python - <<'EOF'
+                  import re, os, pathlib
+
+                  toml_path = pathlib.Path("pyproject.toml")
+                  content = toml_path.read_text()
+
+                  m = re.search(r'^version\s*=\s*"(\d+)\.(\d+)\.(\d+)"', content, re.MULTILINE)
+                  if not m:
+                      raise SystemExit("Could not find version field in pyproject.toml")
+
+                  new_version = f"{m.group(1)}.{m.group(2)}.{int(m.group(3)) + 1}"
+                  new_content = re.sub(
+                      r'^(version\s*=\s*)"(\d+\.\d+\.\d+)"',
+                      f'\\g<1>"{new_version}"',
+                      content,
+                      flags=re.MULTILINE,
+                  )
+                  toml_path.write_text(new_content)
+                  print(f"Bumped version to {new_version}")
+
+                  with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+                      fh.write(f"new_version={new_version}\n")
+                  EOF
+
+            - name: Commit and push version bump
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git add pyproject.toml
+                  git commit -m "chore: bump version to ${{ steps.bump_version.outputs.new_version }} [skip ci]"
+                  git push
+
+            - name: Build and upload to TestPyPI
+              env:
+                  PYTHON_BIN: python
+                  TWINE_BIN: twine
+                  TWINE_USERNAME: __token__
+                  TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
+              run: bash build.sh
